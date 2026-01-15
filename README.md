@@ -69,3 +69,7 @@ kubectl apply -f alerts/prometheus-rules.yaml
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+<!-- JN -->
+
+<!-- JN -->
