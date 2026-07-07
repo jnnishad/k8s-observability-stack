@@ -1,0 +1,32 @@
+# Grafana Mimir — long-term Prometheus metrics storage with HA
+# helm repo add grafana https://grafana.github.io/helm-charts
+# helm install mimir grafana/mimir-distributed -f helm/values-mimir.yaml -n monitoring
+
+mimir:
+  structuredConfig:
+    limits:
+      max_global_series_per_user: 3000000
+      ingestion_rate: 100000
+    common:
+      storage:
+        backend: s3
+        s3:
+          endpoint: s3.eu-central-1.amazonaws.com
+          bucket_name: REPLACE_WITH_YOUR_MIMIR_BUCKET
+
+ingester:
+  replicas: 3
+  resources:
+    requests: { cpu: 500m, memory: 1Gi }
+    limits: { cpu: "2", memory: 4Gi }
+
+querier:
+  replicas: 2
+
+query_frontend:
+  replicas: 2
+
+store_gateway:
+  replicas: 3
+  persistentVolume:
+    size: 20Gi

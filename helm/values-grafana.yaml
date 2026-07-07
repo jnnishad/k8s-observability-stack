@@ -1,0 +1,38 @@
+# Grafana — dashboards + explore, datasources pointed at Mimir/Loki
+# helm repo add grafana https://grafana.github.io/helm-charts
+# helm install grafana grafana/grafana -f helm/values-grafana.yaml -n monitoring
+
+replicas: 2
+
+persistence:
+  enabled: true
+  size: 5Gi
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Mimir
+        type: prometheus
+        url: http://mimir-nginx.monitoring.svc.cluster.local/prometheus
+        isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki-read.monitoring.svc.cluster.local:3100
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        folder: ""
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    kubernetes-cluster-overview:
+      file: dashboards/kubernetes-cluster-overview.json
+    node-exporter:
+      file: dashboards/node-exporter.json

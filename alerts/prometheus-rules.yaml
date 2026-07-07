@@ -1,0 +1,62 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cluster-slo-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prom
+spec:
+  groups:
+    - name: node.rules
+      rules:
+        - alert: NodeHighCPU
+          expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: "High CPU on {{ $labels.instance }}"
+            description: "CPU usage above 85% for 10m ({{ $value | printf \"%.1f\" }}%)."
+
+        - alert: NodeMemoryPressure
+          expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+          for: 10m
+          labels: { severity: critical }
+          annotations:
+            summary: "Memory pressure on {{ $labels.instance }}"
+            description: "Available memory below 10% for 10m."
+
+    - name: kubernetes.rules
+      rules:
+        - alert: PodCrashLooping
+          expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} is crash looping"
+            description: "Container {{ $labels.container }} restarted more than 3 times in 15m."
+
+        - alert: DeploymentReplicasMismatch
+          expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+          for: 15m
+          labels: { severity: warning }
+          annotations:
+            summary: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} degraded"
+            description: "Desired replicas do not match available replicas for 15m."
+
+        - alert: PersistentVolumeFillingUp
+          expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.1
+          for: 5m
+          labels: { severity: critical }
+          annotations:
+            summary: "PV {{ $labels.persistentvolumeclaim }} is filling up"
+            description: "Less than 10% free space remaining."
+
+    - name: api-server.rules
+      rules:
+        - alert: KubeAPIErrorRateHigh
+          expr: sum(rate(apiserver_request_total{code=~"5.."}[5m])) / sum(rate(apiserver_request_total[5m])) > 0.05
+          for: 5m
+          labels: { severity: critical }
+          annotations:
+            summary: "Kubernetes API server error rate above 5%"
+            description: "5xx error ratio has been above 5% for 5 minutes."

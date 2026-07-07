@@ -1,0 +1,42 @@
+# kube-prometheus-stack overrides
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm install kube-prom prometheus-community/kube-prometheus-stack -f helm/values-prometheus.yaml -n monitoring --create-namespace
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    resources:
+      requests: { cpu: 500m, memory: 2Gi }
+      limits: { cpu: "2", memory: 4Gi }
+    # Ship to Mimir for long-term storage instead of relying on local retention.
+    remoteWrite:
+      - url: http://mimir-nginx.monitoring.svc.cluster.local/api/v1/push
+        queueConfig:
+          maxSamplesPerSend: 5000
+          maxShards: 30
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+  config:
+    route:
+      receiver: "default"
+      group_by: ["alertname", "namespace"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+    receivers:
+      - name: "default"
+
+grafana:
+  enabled: false  # deployed separately via values-grafana.yaml so dashboards/datasources are versioned independently
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
