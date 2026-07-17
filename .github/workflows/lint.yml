@@ -13,7 +13,8 @@ jobs:
       - name: Install yamllint
         run: pip install yamllint
       - name: Lint YAML
-        run: yamllint -d "{extends: default, rules: {line-length: {max: 200}}}" helm/ alerts/ dashboards/
+        run: |
+          yamllint -d "{extends: default, rules: {line-length: {max: 200}}}" helm/ alerts/ dashboards/
 
   helm-lint:
     runs-on: ubuntu-latest
