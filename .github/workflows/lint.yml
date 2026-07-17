@@ -29,5 +29,9 @@ jobs:
           helm template kube-prom prometheus-community/kube-prometheus-stack -f helm/values-prometheus.yaml > /dev/null
           helm template grafana grafana/grafana -f helm/values-grafana.yaml > /dev/null
           helm template mimir grafana/mimir-distributed -f helm/values-mimir.yaml > /dev/null
-          helm template loki grafana/loki -f helm/values-loki.yaml > /dev/null
+          # --set loki.useTestSchema=true: the chart refuses to render without a
+          # schema_config, which is deliberately environment-specific and left out
+          # of values-loki.yaml. This flag is Loki's own documented way to smoke-test
+          # a values file without committing to a storage backend.
+          helm template loki grafana/loki -f helm/values-loki.yaml --set loki.useTestSchema=true > /dev/null
           helm template alloy grafana/alloy -f helm/values-alloy.yaml > /dev/null
