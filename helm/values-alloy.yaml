@@ -1,3 +1,4 @@
+---
 # Grafana Alloy — unified telemetry collector (metrics, logs, traces)
 # deployed as a DaemonSet so every node ships its own logs/metrics.
 # helm repo add grafana https://grafana.github.io/helm-charts
@@ -36,5 +37,5 @@ controller:
   type: daemonset
 
 resources:
-  requests: { cpu: 100m, memory: 128Mi }
-  limits: { cpu: 500m, memory: 512Mi }
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {cpu: 500m, memory: 512Mi}

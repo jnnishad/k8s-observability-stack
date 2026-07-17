@@ -1,3 +1,4 @@
+---
 # Grafana — dashboards + explore, datasources pointed at Mimir/Loki
 # helm repo add grafana https://grafana.github.io/helm-charts
 # helm install grafana grafana/grafana -f helm/values-grafana.yaml -n monitoring

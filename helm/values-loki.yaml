@@ -1,3 +1,4 @@
+---
 # Loki — log aggregation, fed by Alloy agents cluster-wide
 # helm repo add grafana https://grafana.github.io/helm-charts
 # helm install loki grafana/loki -f helm/values-loki.yaml -n monitoring

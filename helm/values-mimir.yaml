@@ -1,3 +1,4 @@
+---
 # Grafana Mimir — long-term Prometheus metrics storage with HA
 # helm repo add grafana https://grafana.github.io/helm-charts
 # helm install mimir grafana/mimir-distributed -f helm/values-mimir.yaml -n monitoring
@@ -17,8 +18,8 @@ mimir:
 ingester:
   replicas: 3
   resources:
-    requests: { cpu: 500m, memory: 1Gi }
-    limits: { cpu: "2", memory: 4Gi }
+    requests: {cpu: 500m, memory: 1Gi}
+    limits: {cpu: "2", memory: 4Gi}
 
 querier:
   replicas: 2
